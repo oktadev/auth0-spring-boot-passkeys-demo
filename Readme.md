@@ -28,8 +28,10 @@ Sign up for a free [Auth0 Account](https://auth0.com/signup). If you have an exi
 ### Enable passkeys for your Auth0 tenant
 
 1. Log in to your [Auth0 Dashboard](https://manage.auth0.com) and navigate to **Authentication** > **Database** > **Username-Password-Authentication**.
-2. If the second tab says **Password Policy**, go to step 3. If the second tab says **Authentication Methods**, you have passkeys enabled. Click on **Authentication Methods** tab and enable **Passkey**.
-3. [Create a new tenant](https://auth0.com/docs/get-started/auth0-overview/create-tenants), then navigate to **Authentication** > **Authentication Profile** and select **Identifer First**. **Save** your changes. Now go to step 2.
+2. If the second tab says **Password Policy**, go to step 3. If the second tab says **Authentication Methods**, you have passkeys enabled go to step 4.
+3. [Create a new tenant](https://auth0.com/docs/get-started/auth0-overview/create-tenants),
+4. Navigate to **Authentication** > **Authentication Profile** and select **Identifer First**. **Save** your changes.
+5. Navigate to **Authentication** > **Database** > **Username-Password-Authentication** and click on **Authentication Methods** tab and enable **Passkey**.
 
 ### Install the Auth0 CLI
 
