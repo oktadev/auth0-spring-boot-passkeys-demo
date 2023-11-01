@@ -1,8 +1,8 @@
-# Passkeys with Spring Boot and Auth0
+# Passkeys with Spring Boot and Auth0 by Okta
 
 This is a bare-bones Spring Boot web application configured to use the [Okta Spring Boot Starter](https://github.com/okta/okta-spring-boot) which auto-configures OIDC authentication with Spring Security.
 
-Auth0 is used as the IdP to demonstrate the passkeys feature for passwordless login.
+Auth0 by Okta is used as the IdP to demonstrate the passkeys feature for passwordless login.
 
 ## Why use passkeys?
 
@@ -13,12 +13,13 @@ We believe that passkeys offer a viable alternative to passwords for consumer ap
 ### Create a Spring Boot App
 
 ```shell
-curl -G https://start.spring.io/starter.tgz -d dependencies=web,okta -d baseDir=passkey-demo | tar -xzvf -
+curl -G https://start.spring.io/starter.tgz \
+  -d dependencies=web,okta -d baseDir=passkey-demo | tar -xzvf -
 ```
 
 ### Add a home page and logout feature (Optional)
 
-See [this commit](https://github.com/oktadev/auth0-spring-boot-passkeys-demo/commit/7071b7ff15cee4a0517d4c7645004d3674186b78)
+See [this commit](https://github.com/oktadev/auth0-spring-boot-passkeys-demo/commit/7071b7ff15cee4a0517d4c7645004d3674186b78) for the code.
 
 ### Create an Auth0 account
 
@@ -40,6 +41,8 @@ Other [installation](https://developer.auth0.com/resources/labs/tools/auth0-cli-
 
 ### Create an Auth0 app
 
+Login to the Auth0 CLI and create an Auth0 app.
+
 ```shell
 # Login to the tenant
 auth0 login
@@ -60,7 +63,7 @@ Note the domain, client ID and client secret.
 
 Update the domain, client ID and client secret to an `application.properties` file on the root of the app.
 
-Start the app
+Start the app.
 
 ```shell
 ./gradlew bootRun
