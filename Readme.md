@@ -17,6 +17,28 @@ curl -G https://start.spring.io/starter.tgz \
   -d dependencies=web,okta -d baseDir=passkey-demo | tar -xzvf -
 ```
 
+Create a `HomeController.java` class next to `DemoApplication.java`:
+
+Populate it with the following code:
+
+```java
+package com.example.demo;
+
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+class HomeController {
+
+    @GetMapping("/")
+    public String home(@AuthenticationPrincipal OidcUser user) {
+        return "Hello, " + user.getFullName() + "!";
+    }
+}
+```
+
 ### Add a home page and logout feature (Optional)
 
 See [this commit](https://github.com/oktadev/auth0-spring-boot-passkeys-demo/commit/7071b7ff15cee4a0517d4c7645004d3674186b78) for the code.
@@ -25,18 +47,25 @@ See [this commit](https://github.com/oktadev/auth0-spring-boot-passkeys-demo/com
 
 Sign up for a free [Auth0 Account](https://auth0.com/signup). If you have an existing account, [create a new Tenant](https://auth0.com/docs/get-started/auth0-overview/create-tenants).
 
-### Enable passkeys for your Auth0 tenant
+### Enable passkeys on your Auth0 tenant
 
 1. Log in to your [Auth0 Dashboard](https://manage.auth0.com) and navigate to **Authentication** > **Database** > **Username-Password-Authentication**.
-2. If the second tab says **Password Policy**, go to step 3. If the second tab says **Authentication Methods**, you have passkeys enabled go to step 4.
-3. [Create a new tenant](https://auth0.com/docs/get-started/auth0-overview/create-tenants),
-4. Navigate to **Authentication** > **Authentication Profile** and select **Identifer First**. **Save** your changes.
-5. Navigate to **Authentication** > **Database** > **Username-Password-Authentication** and click on **Authentication Methods** tab and enable **Passkey**.
+   1. If the second tab says **Password Policy**, your tenant doesn't support passkeys, [Create a new tenant](https://auth0.com/docs/get-started/auth0-overview/create-tenants) and proceed to the next step.
+   2. If the second tab says **Authentication Methods**, your tenant supports passkeys, proceed to the next step.
+2. Navigate to **Authentication** > **Authentication Profile** and select **Identifer First**. **Save** your changes.
+3. Navigate to **Authentication** > **Database** > **Username-Password-Authentication** and click on **Authentication Methods** tab and enable **Passkey**.
 
 ### Install the Auth0 CLI
 
 ```shell
+# Using Homebrew on macOS and Linux
 brew tap auth0/auth0-cli && brew install auth0
+
+# ---- OR ----
+# Download the binary using cURL. Binary will be downloaded to current folder as "./auth0".
+curl -sSfL https://raw.githubusercontent.com/auth0/auth0-cli/main/install.sh | sh -s -- -b .
+# To be able to run the binary from any directory, make sure you move it to a place in your $PATH
+sudo mv ./auth0 /usr/local/bin
 ```
 
 Other [installation](https://developer.auth0.com/resources/labs/tools/auth0-cli-basics#lab-setup) options are also available.
@@ -52,7 +81,7 @@ auth0 login
 # Create an Auth0 app
 auth0 apps create \
   --name "Spring Boot Passkeys" \
-  --description "Spring Boot Example" \
+  --description "Spring Boot passkeys Demo" \
   --type regular \
   --callbacks http://localhost:8080/login/oauth2/code/okta \
   --logout-urls http://localhost:8080 \
@@ -64,6 +93,12 @@ Note the domain, client ID and client secret.
 ### Start the app and sign up with passkeys
 
 Update the domain, client ID and client secret to an `application.properties` file on the root of the app.
+
+```
+okta.oauth2.issuer=https://<AUTH0_domain>/
+okta.oauth2.client-id=<AUTH0_clientId>
+okta.oauth2.client-secret=<AUTH0_clientSecret>
+```
 
 Start the app.
 
