@@ -1,33 +1,33 @@
 package com.example.demo;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.logout.LogoutHandler;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-
-import java.io.IOException;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 public class SecurityConfiguration {
 
-    @Value("${okta.oauth2.issuer}")
-    private String issuer;
-    @Value("${okta.oauth2.client-id}")
-    private String clientId;
+    private final ClientRegistrationRepository clientRegistrationRepository;
 
-    LogoutHandler oidcLogoutHandler() {
-        return (request, response, authentication) -> {
-            try {
-                response.sendRedirect(issuer + "v2/logout?client_id=" + clientId + "&returnTo=http://localhost:8080/");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        };
+    public SecurityConfiguration(ClientRegistrationRepository clientRegistrationRepository) {
+        this.clientRegistrationRepository = clientRegistrationRepository;
+    }
+
+    private LogoutSuccessHandler oidcLogoutSuccessHandler() {
+        OidcClientInitiatedLogoutSuccessHandler oidcLogoutSuccessHandler =
+            new OidcClientInitiatedLogoutSuccessHandler(this.clientRegistrationRepository);
+
+        // Sets the location that the End-User's User Agent will be redirected to
+        // after the logout has been performed at the Provider
+        oidcLogoutSuccessHandler.setPostLogoutRedirectUri("{baseUrl}");
+
+        return oidcLogoutSuccessHandler;
     }
 
     @Bean
@@ -37,8 +37,9 @@ public class SecurityConfiguration {
                 .anyRequest().authenticated()
             )
             .oauth2Login(withDefaults())
-            .logout(logout -> logout.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                .addLogoutHandler(oidcLogoutHandler()));
+            .logout((logout) -> logout
+                .logoutSuccessHandler(oidcLogoutSuccessHandler())
+            );
         return http.build();
     }
 }
