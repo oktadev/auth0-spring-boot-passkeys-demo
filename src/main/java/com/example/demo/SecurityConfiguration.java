@@ -19,27 +19,23 @@ public class SecurityConfiguration {
         this.clientRegistrationRepository = clientRegistrationRepository;
     }
 
-    private LogoutSuccessHandler oidcLogoutSuccessHandler() {
-        OidcClientInitiatedLogoutSuccessHandler oidcLogoutSuccessHandler =
+    private LogoutSuccessHandler logoutSuccessHandler() {
+        OidcClientInitiatedLogoutSuccessHandler logoutSuccessHandler =
             new OidcClientInitiatedLogoutSuccessHandler(this.clientRegistrationRepository);
 
         // Sets the location that the End-User's User Agent will be redirected to
         // after the logout has been performed at the Provider
-        oidcLogoutSuccessHandler.setPostLogoutRedirectUri("{baseUrl}");
+        logoutSuccessHandler.setPostLogoutRedirectUri("{baseUrl}");
 
-        return oidcLogoutSuccessHandler;
+        return logoutSuccessHandler;
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .authorizeHttpRequests(authorize -> authorize
-                .anyRequest().authenticated()
-            )
+            .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
             .oauth2Login(withDefaults())
-            .logout((logout) -> logout
-                .logoutSuccessHandler(oidcLogoutSuccessHandler())
-            );
+            .logout(logout -> logout.logoutSuccessHandler(logoutSuccessHandler()));
         return http.build();
     }
 }
